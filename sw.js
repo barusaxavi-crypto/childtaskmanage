@@ -1,9 +1,9 @@
-const CACHE_NAME = 'princess-quest-v3';
+const CACHE_NAME = 'princess-quest-v4';
 const ASSETS = [
   './',
-  './index.html?v=3',
-  './css/style.css?v=3',
-  './js/app.js?v=3',
+  './index.html?v=4',
+  './css/style.css?v=4',
+  './js/app.js?v=4',
   './manifest.json'
 ];
 

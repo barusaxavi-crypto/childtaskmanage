@@ -133,13 +133,13 @@ function playSparkleSound() {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.06);
-    gain.gain.setValueAtTime(0.15, audioCtx.currentTime + idx * 0.06);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.06 + 0.3);
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.05);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime + idx * 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.05 + 0.3);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-    osc.start(audioCtx.currentTime + idx * 0.06);
-    osc.stop(audioCtx.currentTime + idx * 0.06 + 0.35);
+    osc.start(audioCtx.currentTime + idx * 0.05);
+    osc.stop(audioCtx.currentTime + idx * 0.05 + 0.35);
   });
 }
 
@@ -147,17 +147,18 @@ function playFanfareSound() {
   if (!state.soundEnabled) return;
   initAudio();
   const chords = [
-    { freq: 523.25, time: 0, dur: 0.15 },
-    { freq: 659.25, time: 0.15, dur: 0.15 },
-    { freq: 783.99, time: 0.3, dur: 0.15 },
-    { freq: 1046.50, time: 0.45, dur: 0.6 }
+    { freq: 523.25, time: 0, dur: 0.12 },
+    { freq: 659.25, time: 0.12, dur: 0.12 },
+    { freq: 783.99, time: 0.24, dur: 0.12 },
+    { freq: 1046.50, time: 0.36, dur: 0.6 },
+    { freq: 1318.51, time: 0.45, dur: 0.8 }
   ];
   chords.forEach((c) => {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = 'triangle';
     osc.frequency.setValueAtTime(c.freq, audioCtx.currentTime + c.time);
-    gain.gain.setValueAtTime(0.25, audioCtx.currentTime + c.time);
+    gain.gain.setValueAtTime(0.5, audioCtx.currentTime + c.time);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + c.time + c.dur);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
@@ -166,24 +167,41 @@ function playFanfareSound() {
   });
 }
 
+// 🚨 大迫力！テレビの音を突き抜ける3連警告音
 function playAlarmBeep() {
   if (!state.soundEnabled) return;
   initAudio();
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
-  gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-  osc.start(audioCtx.currentTime);
-  osc.stop(audioCtx.currentTime + 0.13);
+
+  const beeps = [0, 0.12, 0.24];
+  beeps.forEach((t, i) => {
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc1.type = 'sawtooth';
+    osc2.type = 'square';
+
+    const freq = i === 2 ? 1500 : 1200;
+    osc1.frequency.setValueAtTime(freq, audioCtx.currentTime + t);
+    osc2.frequency.setValueAtTime(freq * 1.5, audioCtx.currentTime + t);
+
+    const dur = i === 2 ? 0.25 : 0.08;
+    gain.gain.setValueAtTime(0.6, audioCtx.currentTime + t);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + t + dur);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc1.start(audioCtx.currentTime + t);
+    osc2.start(audioCtx.currentTime + t);
+    osc1.stop(audioCtx.currentTime + t + dur + 0.02);
+    osc2.stop(audioCtx.currentTime + t + dur + 0.02);
+  });
 }
 
 // ==================== 4. アプリケーション初期化 ＆ UI描画 ====================
 document.addEventListener('DOMContentLoaded', () => {
-  // 自動で朝/夜判定（14時以降は夜）
   const hour = new Date().getHours();
   state.mode = (hour >= 5 && hour < 14) ? 'morning' : 'evening';
   
@@ -191,7 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
   startClock();
   setupEventListeners();
 
-  // PWA Service Worker 登録
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(console.error);
   }
@@ -228,7 +245,6 @@ function renderApp() {
     ? 'radial-gradient(circle at 50% 0%, #fdf2f8 0%, #fae8ff 40%, #f3e8ff 100%)'
     : 'radial-gradient(circle at 50% 0%, #2e1065 0%, #3b0764 40%, #1e1b4b 100%)';
 
-  // ヘッダータイトルの更新
   const modeBadge = document.getElementById('modeBadge');
   if (modeBadge) {
     modeBadge.innerHTML = isMorning
@@ -236,7 +252,6 @@ function renderApp() {
       : '<span class="text-indigo-400">🌙</span> <span class="bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent font-black">よるのプリンセスクエスト</span>';
   }
 
-  // レーン生成
   const lanesContainer = document.getElementById('lanesContainer');
   if (!lanesContainer) return;
 
@@ -246,8 +261,12 @@ function renderApp() {
     ? state.kids 
     : [state.kids[state.activeKidIndex] || state.kids[0]];
 
+  // 3人以上なら自動でグリッド調整
+  const colCount = kidsToRender.length;
   lanesContainer.className = state.layout === 'split'
-    ? 'grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 flex-1 w-full max-w-7xl mx-auto'
+    ? (colCount === 1 ? 'flex justify-center flex-1 w-full max-w-3xl mx-auto' :
+       colCount === 2 ? 'grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 flex-1 w-full max-w-7xl mx-auto' :
+       'grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 w-full max-w-7xl mx-auto')
     : 'flex justify-center flex-1 w-full max-w-3xl mx-auto';
 
   kidsToRender.forEach((kid) => {
@@ -255,17 +274,14 @@ function renderApp() {
     lanesContainer.insertAdjacentHTML('beforeend', laneHtml);
   });
 
-  // アイコンリフレッシュ
   if (window.lucide) {
     window.lucide.createIcons();
   }
 }
 
 function createKidLaneHtml(kid) {
-  const isMorning = state.mode === 'morning';
   const completedIds = getCompletedTaskIds(kid.id, state.mode);
   
-  // 対象タスクのフィルタリング
   const availableTasks = state.tasks
     .filter(t => t.timeOfDay === state.mode && (t.targetKidId === 'all' || t.targetKidId === kid.id))
     .sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -274,8 +290,8 @@ function createKidLaneHtml(kid) {
   const doneCount = completedIds.filter(id => availableTasks.some(t => t.id === id)).length;
   const progressPercent = total > 0 ? Math.round((doneCount / total) * 100) : 0;
   const isAllClear = total > 0 && doneCount === total;
+  const coinCount = kid.coins || 0;
 
-  // 最初の未完了タスクを見つけてアクティブにする
   let firstPendingFound = false;
 
   const tasksListHtml = availableTasks.map((t) => {
@@ -292,32 +308,32 @@ function createKidLaneHtml(kid) {
     return `
       <div 
         onclick="toggleTask('${kid.id}', '${t.id}')"
-        class="glass-card relative p-3.5 md:p-4 rounded-2xl cursor-pointer flex items-center justify-between transition-all duration-300 ${isDone ? 'task-completed' : activeClass}"
+        class="glass-card relative p-3 md:p-4 rounded-2xl cursor-pointer flex items-center justify-between transition-all duration-300 ${isDone ? 'task-completed' : activeClass}"
         id="task_${kid.id}_${t.id}"
       >
-        <div class="flex items-center space-x-3.5 flex-1 min-w-0">
-          <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl bg-white/90 shadow-sm border border-pink-100 flex-shrink-0">
+        <div class="flex items-center space-x-3 flex-1 min-w-0">
+          <div class="w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center text-2xl bg-white/90 shadow-sm border border-pink-100 flex-shrink-0">
             ${t.icon || '✨'}
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center space-x-2">
-              <span class="text-xs font-bold px-2 py-0.5 rounded-full ${t.targetKidId !== 'all' ? 'bg-pink-100 text-pink-700' : 'bg-purple-100 text-purple-700'}">
-                ${t.targetKidId !== 'all' ? '👑 せんよう' : '🌟 ふたり'}
+              <span class="text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full ${t.targetKidId !== 'all' ? 'bg-pink-100 text-pink-700' : 'bg-purple-100 text-purple-700'}">
+                ${t.targetKidId !== 'all' ? '👑 せんよう' : '🌟 共通'}
               </span>
-              <span class="text-xs font-semibold text-gray-400 font-num">${t.time || ''}</span>
+              <span class="text-[10px] md:text-xs font-semibold text-gray-400 font-num">${t.time || ''}</span>
             </div>
-            <div class="text-base md:text-lg font-bold text-gray-800 truncate mt-0.5">
+            <div class="text-sm md:text-base font-bold text-gray-800 truncate mt-0.5">
               ${t.text}
             </div>
           </div>
         </div>
 
-        <div class="ml-3 flex-shrink-0">
+        <div class="ml-2 flex-shrink-0">
           ${isDone 
-            ? `<div class="w-10 h-10 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white flex items-center justify-center text-xl shadow-md crown-stamp">👑</div>`
+            ? `<div class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white flex items-center justify-center text-lg md:text-xl shadow-md crown-stamp">👑</div>`
             : isCurrent
-            ? `<div class="w-10 h-10 rounded-full bg-amber-400/20 border-2 border-amber-400 text-amber-600 flex items-center justify-center font-bold text-sm animate-bounce">つぎ！</div>`
-            : `<div class="w-10 h-10 rounded-full border-2 border-pink-200 bg-white/60 flex items-center justify-center"></div>`
+            ? `<div class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-amber-400/20 border-2 border-amber-400 text-amber-600 flex items-center justify-center font-bold text-xs md:text-sm animate-bounce">つぎ！</div>`
+            : `<div class="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-pink-200 bg-white/60 flex items-center justify-center"></div>`
           }
         </div>
       </div>
@@ -327,76 +343,80 @@ function createKidLaneHtml(kid) {
   return `
     <div class="glass-panel p-4 md:p-6 rounded-3xl flex flex-col h-full shadow-xl border-2 border-white/80 relative overflow-hidden">
       <!-- レーンヘッダー -->
-      <div class="flex items-center justify-between pb-4 border-b border-pink-100/80 mb-4">
+      <div class="flex items-center justify-between pb-3 md:pb-4 border-b border-pink-100/80 mb-3 md:mb-4">
         <div class="flex items-center space-x-3">
           <div class="relative">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-400 to-purple-400 flex items-center justify-center text-3xl shadow-md border-2 border-white">
+            <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-tr from-pink-400 to-purple-400 flex items-center justify-center text-2xl md:text-3xl shadow-md border-2 border-white">
               ${kid.avatar || '👸'}
             </div>
-            <div class="absolute -top-2 -right-1 text-sm">${kid.equipped?.head || '👑'}</div>
+            <div class="absolute -top-2 -right-1 text-xs md:text-sm">${kid.equipped?.head || '👑'}</div>
           </div>
           <div>
             <div class="flex items-center space-x-2">
-              <h2 class="text-xl md:text-2xl font-black text-gray-800">${kid.name}</h2>
-              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
-                🔥 ${kid.streak || 1}日れんぞく
+              <h2 class="text-lg md:text-xl font-black text-gray-800">${kid.name}</h2>
+              <span class="text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                🔥 ${kid.streak || 1}日目
               </span>
             </div>
-            <p class="text-xs font-bold text-pink-600">${kid.title || 'みならいプリンセス'}</p>
+            <p class="text-[11px] md:text-xs font-bold text-pink-600">${kid.title || 'みならいプリンセス'}</p>
           </div>
         </div>
 
-        <!-- コイン残高 & ガチャリンク -->
         <button onclick="openBookModal('${kid.id}')" class="flex items-center space-x-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-100 to-yellow-100 border border-amber-300 rounded-2xl shadow-sm hover:scale-105 transition-transform">
-          <span class="text-xl">💎</span>
-          <span class="font-extrabold text-amber-900 font-num text-sm md:text-base">${kid.coins || 0}</span>
-          <span class="text-xs font-bold text-amber-700 ml-1">ずかん</span>
+          <span class="text-lg md:text-xl">💎</span>
+          <span class="font-extrabold text-amber-900 font-num text-sm md:text-base">${coinCount}</span>
+          <span class="text-[10px] md:text-xs font-bold text-amber-700 ml-0.5">ずかん</span>
         </button>
       </div>
 
       <!-- プログレスバー -->
-      <div class="mb-4">
+      <div class="mb-3 md:mb-4">
         <div class="flex justify-between items-center text-xs md:text-sm font-bold text-gray-600 mb-1.5">
           <span>まほうのじゅんび度</span>
-          <span class="font-num text-pink-600 font-extrabold text-base">${progressPercent}% (${doneCount}/${total})</span>
+          <span class="font-num text-pink-600 font-extrabold text-sm md:text-base">${progressPercent}% (${doneCount}/${total})</span>
         </div>
-        <div class="w-full h-4 bg-pink-100/80 rounded-full overflow-hidden p-0.5 border border-pink-200 shadow-inner">
+        <div class="w-full h-3.5 md:h-4 bg-pink-100/80 rounded-full overflow-hidden p-0.5 border border-pink-200 shadow-inner">
           <div 
             class="h-full bg-gradient-to-r from-pink-400 via-purple-400 to-amber-400 rounded-full transition-all duration-700 ease-out flex items-center justify-end pr-1"
             style="width: ${progressPercent}%"
           >
-            ${progressPercent > 10 ? '<span class="text-[9px] text-white font-black">✨</span>' : ''}
+            ${progressPercent > 10 ? '<span class="text-[8px] text-white font-black">✨</span>' : ''}
           </div>
         </div>
       </div>
 
       <!-- タスク一覧 -->
-      <div class="space-y-3 flex-1 overflow-y-auto pr-1 pb-2">
+      <div class="space-y-2.5 md:space-y-3 flex-1 overflow-y-auto pr-1 pb-2">
         ${tasksListHtml}
       </div>
 
-      <!-- 全クリア時のガチャ出現エリア -->
-      ${isAllClear ? `
-        <div class="mt-4 pt-3 border-t border-pink-200">
+      <!-- ガチャエリア（コイン消費制） -->
+      <div class="mt-3 pt-3 border-t border-pink-200">
+        ${coinCount > 0 ? `
           <button 
             onclick="triggerGachaSpin('${kid.id}')"
-            class="gacha-btn-glow w-full py-4 px-6 rounded-2xl text-white font-black text-lg md:text-xl shadow-xl flex items-center justify-center space-x-3 transform transition hover:scale-105"
+            class="gacha-btn-glow w-full py-3.5 md:py-4 px-4 rounded-2xl text-white font-black text-base md:text-lg shadow-xl flex items-center justify-center space-x-2 transform transition hover:scale-102 active:scale-98"
           >
-            <span class="text-2xl animate-spin">💎</span>
-            <span>パーフェクト！ まほうガチャをまわす！</span>
-            <span class="text-2xl">🎁</span>
+            <span class="text-xl animate-spin">💎</span>
+            <span>ガチャをまわす！（のこり ${coinCount}回）</span>
+            <span class="text-xl">🎁</span>
           </button>
-          ${state.realRewardEnabled ? `
-            <div class="mt-2 text-center text-xs font-bold text-pink-700 bg-pink-50 p-2 rounded-xl border border-pink-200">
-              🎉 リアルごほうびゲット: <span class="text-pink-900 font-black">${state.realRewardText}</span>
-            </div>
-          ` : ''}
-        </div>
-      ` : `
-        <div class="mt-3 text-center text-xs font-bold text-gray-400">
-          ✨ ぜんぶチェックすると【まほうガチャ】がひけるよ！
-        </div>
-      `}
+        ` : isAllClear ? `
+          <div class="text-center py-2 px-3 bg-pink-50 rounded-xl border border-pink-200">
+            <span class="text-xs font-bold text-pink-800">🎉 今日のタスク達成！コイン獲得済み✨ 明日もがんばろう！</span>
+          </div>
+        ` : `
+          <div class="text-center py-2 text-xs font-bold text-gray-400">
+            ✨ 全部クリアすると【まほうコイン 💎】がもらえるよ！
+          </div>
+        `}
+
+        ${state.realRewardEnabled && isAllClear ? `
+          <div class="mt-2 text-center text-xs font-bold text-pink-700 bg-pink-50 p-2 rounded-xl border border-pink-200">
+            🎉 リアルごほうび: <span class="text-pink-900 font-black">${state.realRewardText}</span>
+          </div>
+        ` : ''}
+      </div>
     </div>
   `;
 }
@@ -408,30 +428,36 @@ window.toggleTask = function(kidId, taskId) {
   const isDone = completedIds.includes(taskId);
 
   if (isDone) {
-    // 解除
     const idx = completedIds.indexOf(taskId);
     if (idx > -1) completedIds.splice(idx, 1);
   } else {
-    // 完了
     completedIds.push(taskId);
     playSparkleSound();
     launchTaskConfetti();
 
     // 全完了チェック
     const availableTasks = state.tasks.filter(t => t.timeOfDay === state.mode && (t.targetKidId === 'all' || t.targetKidId === kidId));
-    if (availableTasks.every(t => completedIds.includes(t.id))) {
-      // 祝！全完了
-      setTimeout(() => {
-        playFanfareSound();
-        launchFullConfetti();
-        // コイン+1
+    if (availableTasks.length > 0 && availableTasks.every(t => completedIds.includes(t.id))) {
+      
+      const today = getTodayString();
+      const rewardKey = state.mode + '_rewarded';
+      
+      // 1日1回のコイン付与
+      if (!state.completions[today][kidId][rewardKey]) {
+        state.completions[today][kidId][rewardKey] = true;
         const kid = state.kids.find(k => k.id === kidId);
         if (kid) {
           kid.coins = (kid.coins || 0) + 1;
+          kid.streak = (kid.streak || 0) + 1;
         }
-        saveState();
-        renderApp();
-      }, 400);
+
+        setTimeout(() => {
+          playFanfareSound();
+          launchFullConfetti();
+          saveState();
+          renderApp();
+        }, 300);
+      }
     }
   }
 
@@ -449,6 +475,7 @@ window.startParentCountdown = function() {
   if (!overlay || !numDisplay) return;
 
   overlay.classList.remove('hidden');
+  overlay.classList.add('countdown-overlay-fixed');
   numDisplay.textContent = count;
   playAlarmBeep();
 
@@ -463,10 +490,12 @@ window.startParentCountdown = function() {
       clearInterval(countdownTimer);
       numDisplay.textContent = 'START!';
       playFanfareSound();
-      launchTaskConfetti();
+      launchFullConfetti();
       setTimeout(() => {
         overlay.classList.add('hidden');
-      }, 1200);
+        overlay.classList.remove('countdown-overlay-fixed');
+        renderApp(); // 画面レイアウトを確実に再描画
+      }, 1500);
     }
   }, 1000);
 };
@@ -474,7 +503,11 @@ window.startParentCountdown = function() {
 window.cancelCountdown = function() {
   if (countdownTimer) clearInterval(countdownTimer);
   const overlay = document.getElementById('countdownOverlay');
-  if (overlay) overlay.classList.add('hidden');
+  if (overlay) {
+    overlay.classList.add('hidden');
+    overlay.classList.remove('countdown-overlay-fixed');
+  }
+  renderApp();
 };
 
 // ==================== 8. 紙吹雪・星屑パーティクル ====================
@@ -495,14 +528,14 @@ function launchFullConfetti() {
     const colors = ['#ec4899', '#fbbf24', '#a855f7', '#38bdf8', '#ffffff'];
     (function frame() {
       window.confetti({
-        particleCount: 5,
+        particleCount: 6,
         angle: 60,
         spread: 55,
         origin: { x: 0 },
         colors: colors
       });
       window.confetti({
-        particleCount: 5,
+        particleCount: 6,
         angle: 120,
         spread: 55,
         origin: { x: 1 },
@@ -523,33 +556,54 @@ window.triggerGachaSpin = function(kidId) {
   const kid = state.kids.find(k => k.id === kidId);
   if (!kid) return;
 
+  if ((kid.coins || 0) <= 0) {
+    alert('まほうコインが足りないよ！タスクをぜんぶ完了してコインをゲットしよう！✨');
+    return;
+  }
+
   const modal = document.getElementById('gachaModal');
   const stage = document.getElementById('gachaStage');
   const result = document.getElementById('gachaResult');
+  const egg = document.getElementById('gachaEgg');
   if (!modal || !stage || !result) return;
+
+  if (egg) {
+    egg.classList.remove('egg-shake');
+    egg.textContent = '🥚✨';
+  }
 
   modal.classList.remove('hidden');
   stage.classList.remove('hidden');
   result.classList.add('hidden');
 };
 
+// 🥚 卵タップでガチャ実行！
 window.executeSpin = function() {
   initAudio();
   const kid = state.kids.find(k => k.id === currentGachaKidId);
   if (!kid) return;
+
+  if ((kid.coins || 0) <= 0) {
+    alert('まほうコインが足りないよ！');
+    closeGachaModal();
+    return;
+  }
 
   const stage = document.getElementById('gachaStage');
   const result = document.getElementById('gachaResult');
   const egg = document.getElementById('gachaEgg');
   
   if (egg) {
-    egg.classList.add('animate-bounce');
+    egg.classList.add('egg-shake');
+    egg.textContent = '🐣💥';
   }
 
-  // サウンド
+  // コインを1枚消費！
+  kid.coins = Math.max(0, (kid.coins || 0) - 1);
+  saveState();
+
   playSparkleSound();
 
-  // 抽選アルゴリズム
   setTimeout(() => {
     const rand = Math.random();
     let pool = [];
@@ -564,7 +618,6 @@ window.executeSpin = function() {
     }
     const wonItem = pool[Math.floor(Math.random() * pool.length)] || DEFAULT_ITEMS[0];
 
-    // 所持品に追加（重複なし）
     if (!kid.inventory) kid.inventory = [];
     if (!kid.inventory.includes(wonItem.id)) {
       kid.inventory.push(wonItem.id);
@@ -574,7 +627,6 @@ window.executeSpin = function() {
     playFanfareSound();
     launchFullConfetti();
 
-    // 結果表示
     if (stage) stage.classList.add('hidden');
     if (result) {
       result.classList.remove('hidden');
@@ -590,7 +642,7 @@ window.executeSpin = function() {
         wonItem.rarity === 'R' ? 'bg-pink-500' : 'bg-gray-400'
       }`;
     }
-  }, 1200);
+  }, 1000);
 };
 
 window.closeGachaModal = function() {

@@ -14,7 +14,7 @@
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
-  <link rel="stylesheet" href="./css/style.css?v=3">
+  <link rel="stylesheet" href="./css/style.css?v=4">
 </head>
 <body class="sparkle-bg flex flex-col min-h-screen">
 
@@ -89,17 +89,17 @@
   </main>
 
   <!-- ========== 🚨 親の緊急カウントダウン全画面オーバーレイ ========== -->
-  <div id="countdownOverlay" class="hidden fixed inset-0 z-50 countdown-flash backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
-    <div class="bg-white/95 rounded-3xl p-8 max-w-md w-full shadow-2xl border-4 border-amber-400 flex flex-col items-center animate-bounce">
+  <div id="countdownOverlay" class="hidden countdown-overlay-fixed countdown-flash flex flex-col items-center justify-center p-4 text-center">
+    <div class="bg-white/95 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl border-4 border-amber-400 flex flex-col items-center animate-bounce m-auto">
       <div class="text-5xl mb-2">👑 🚨 👑</div>
       <h2 class="text-2xl md:text-3xl font-black text-rose-600 mb-2">まほうのじかんがはじまるよ！</h2>
-      <p class="text-sm font-bold text-gray-600 mb-6">テレビをけして、タブレットにあつまろう！</p>
+      <p class="text-sm font-bold text-gray-600 mb-4">テレビをけして、タブレットにあつまろう！</p>
       <div id="countdownNumber" class="text-7xl md:text-8xl font-black font-num text-amber-500 my-2 drop-shadow-md">
         10
       </div>
       <button 
         onclick="cancelCountdown()"
-        class="mt-6 px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold rounded-xl text-xs"
+        class="mt-4 px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold rounded-xl text-xs"
       >
         とじる
       </button>
@@ -107,22 +107,27 @@
   </div>
 
   <!-- ========== 🎁 まほうガチャ モーダル ========== -->
-  <div id="gachaModal" class="hidden fixed inset-0 z-50 bg-purple-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+  <div id="gachaModal" class="hidden fixed inset-0 z-50 bg-purple-950/75 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="glass-panel bg-white/95 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl border-4 border-pink-300 text-center relative overflow-hidden">
       <div class="text-xs font-extrabold text-pink-600 tracking-wider mb-1">✨ SPECIAL REWARD ✨</div>
-      <h3 class="text-2xl font-black text-gray-800 mb-4">まほうのプリンセスガチャ</h3>
+      <h3 class="text-2xl font-black text-gray-800 mb-3">まほうのプリンセスガチャ</h3>
 
-      <!-- ステージA: ガチャを回す前 -->
-      <div id="gachaStage" class="py-6 flex flex-col items-center">
-        <div id="gachaEgg" class="text-7xl md:text-8xl cursor-pointer hover:scale-110 transition-transform mb-6 filter drop-shadow-lg">
+      <!-- ステージA: ガチャを回す前（たまごタップ可能） -->
+      <div id="gachaStage" class="py-4 flex flex-col items-center">
+        <div 
+          id="gachaEgg" 
+          onclick="executeSpin()"
+          class="text-7xl md:text-8xl cursor-pointer hover:scale-110 active:scale-95 transition-transform mb-3 filter drop-shadow-lg p-2 rounded-full hover:bg-pink-100/50"
+          title="たまごをタップ！"
+        >
           🥚✨
         </div>
-        <p class="text-sm font-bold text-gray-600 mb-6">たまごをタップして魔法のアイテムをゲット！</p>
+        <p class="text-base font-black text-pink-600 mb-4 animate-pulse">👆 たまごをタップしてね！</p>
         <button 
           onclick="executeSpin()"
-          class="gacha-btn-glow px-8 py-3.5 rounded-2xl text-white font-black text-lg shadow-lg hover:scale-105 transition-transform"
+          class="gacha-btn-glow w-full py-3.5 rounded-2xl text-white font-black text-base md:text-lg shadow-lg hover:scale-105 transition-transform"
         >
-          💎 ガチャをまわす！
+          💎 ガチャをまわす！（1回）
         </button>
       </div>
 
@@ -258,6 +263,6 @@
     </div>
   </div>
 
-  <script src="./js/app.js?v=3"></script>
+  <script src="./js/app.js?v=4"></script>
 </body>
 </html>

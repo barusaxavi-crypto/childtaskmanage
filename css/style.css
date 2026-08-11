@@ -107,14 +107,38 @@ body {
   50% { transform: scale(1.04); box-shadow: 0 0 35px rgba(217, 70, 239, 0.8); }
 }
 
-/* 緊急親用カウントダウンオーバーレイ */
+/* 緊急親用カウントダウンオーバーレイ（画面完全固定） */
+.countdown-overlay-fixed {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 999999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(15, 23, 42, 0.85) !important;
+}
+
 .countdown-flash {
-  animation: flashUrgent 1s infinite alternate;
+  animation: flashUrgent 0.5s infinite alternate !important;
 }
 
 @keyframes flashUrgent {
-  0% { background-color: rgba(236, 72, 153, 0.2); }
-  100% { background-color: rgba(245, 158, 11, 0.35); }
+  0% { background-color: rgba(225, 29, 72, 0.4); }
+  100% { background-color: rgba(245, 158, 11, 0.6); }
+}
+
+/* 卵のプルプル振動・割れアニメーション */
+.egg-shake {
+  animation: eggShake 0.6s infinite ease-in-out;
+}
+
+@keyframes eggShake {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-12deg) scale(1.1); }
+  75% { transform: rotate(12deg) scale(1.1); }
 }
 
 /* カスタムスクロールバー */

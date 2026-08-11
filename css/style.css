@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&family=Outfit:wght@400;600;700;900&display=swap');
+
+:root {
+  --font-main: 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-num: 'Outfit', sans-serif;
+}
+
+body {
+  font-family: var(--font-main);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  background: radial-gradient(circle at 50% 0%, #fdf2f8 0%, #fae8ff 40%, #f3e8ff 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* キラキラ星屑の背景アニメーション */
+.sparkle-bg {
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #f472b6, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 40px 70px, #c084fc, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 50px 160px, #fbbf24, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 90px 40px, #f43f5e, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 130px 80px, #a855f7, rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  animation: sparkleTwinkle 6s ease-in-out infinite alternate;
+}
+
+@keyframes sparkleTwinkle {
+  0% { opacity: 0.5; transform: translateY(0); }
+  100% { opacity: 0.9; transform: translateY(-10px); }
+}
+
+/* グラスモルフィズム */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 30px -10px rgba(236, 72, 153, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(253, 232, 243, 0.9);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.glass-card:active {
+  transform: scale(0.98);
+}
+
+/* アクティブ（進行中）タスクの黄金パルス発光 */
+.task-active-pulse {
+  border-color: #fbbf24 !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(254, 243, 199, 0.7)) !important;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.4), 0 10px 25px -5px rgba(245, 158, 11, 0.3) !important;
+  animation: activeGlow 2s infinite ease-in-out;
+}
+
+@keyframes activeGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.4), 0 8px 20px -4px rgba(245, 158, 11, 0.35);
+    transform: translateY(-2px);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.7), 0 14px 28px -2px rgba(245, 158, 11, 0.5);
+    transform: translateY(-4px);
+  }
+}
+
+/* 完了タスク */
+.task-completed {
+  background: linear-gradient(135deg, rgba(24df, 243, 248, 0.7), rgba(243, 232, 255, 0.6)) !important;
+  border-color: #f472b6 !important;
+  opacity: 0.92;
+}
+
+/* キラキラ王冠スタンプ */
+.crown-stamp {
+  animation: stampIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes stampIn {
+  0% { transform: scale(3) rotate(-30deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* ガチャボタンのキラメキアニメーション */
+.gacha-btn-glow {
+  background: linear-gradient(135deg, #ec4899, #d946ef, #8b5cf6, #f59e0b);
+  background-size: 300% 300%;
+  animation: rainbowFlow 4s ease infinite, gachaPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes rainbowFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes gachaPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(236, 72, 153, 0.5); }
+  50% { transform: scale(1.04); box-shadow: 0 0 35px rgba(217, 70, 239, 0.8); }
+}
+
+/* 緊急親用カウントダウンオーバーレイ */
+.countdown-flash {
+  animation: flashUrgent 1s infinite alternate;
+}
+
+@keyframes flashUrgent {
+  0% { background-color: rgba(236, 72, 153, 0.2); }
+  100% { background-color: rgba(245, 158, 11, 0.35); }
+}
+
+/* カスタムスクロールバー */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(244, 114, 182, 0.1);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(244, 114, 182, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(236, 72, 153, 0.7);
+}

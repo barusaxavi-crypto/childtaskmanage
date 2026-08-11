@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>キッズ タスクかんり - へんしゅう</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="header">
+        <a href="{{ url_for('home') }}" class="back-btn">🏠もどる</a>
+        <div class="header-title">
+            <h1>へんしゅう</h1>
+        </div>
+        <div style="width: 100px;"></div> <!-- レイアウト用ダミー -->
+    </div>
+
+    <div class="settings-container">
+
+        <!-- 人物管理セクション -->
+        <div class="settings-section">
+            <h2>👧👦 ひとをへんしゅうする</h2>
+
+            <ul class="settings-list">
+                {% for kid in kids %}
+                <li class="settings-item">
+                    <span class="settings-item-text">{{ kid.name }}</span>
+                    <form action="{{ url_for('delete_kid', kid_id=kid.id) }}" method="POST" style="margin: 0;">
+                        <button type="submit" class="btn-delete" onclick="return confirm('ほんとうにけしますか？');">🗑️
+                            けす</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <form action="{{ url_for('add_kid') }}" method="POST" class="settings-form">
+                <input type="text" name="name" placeholder="あたらしいなまえ" required class="form-input">
+                <button type="submit" class="btn-add">➕ ついか</button>
+            </form>
+        </div>
+
+        <!-- タスク管理セクション -->
+        <div class="settings-section">
+            <h2>📝 タスクをへんしゅうする</h2>
+
+            <ul class="settings-list">
+                {% for task in tasks %}
+                <li class="settings-item task-settings-item">
+                    <div class="task-settings-info">
+                        <span class="task-settings-icon">{{ task.icon }}</span>
+                        <div>
+                            <strong>{{ task.text }}</strong> ({{ task.time|format_time_jp }})<br>
+                            <span class="task-settings-meta">
+                                {% if task.time_of_day == 'morning' %}☀️ あさ{% else %}🌙 よる{% endif %}
+                                / たいしょう: {{ task.kid_name if task.target_kid_id else 'ぜんいん' }}
+                            </span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin: 0;">
+                        <a href="{{ url_for('edit_task', task_id=task.id) }}" class="btn-edit"
+                            style="text-decoration:none; padding:10px 15px; font-size:1rem; font-weight:bold; color:white; background-color:#1e90ff; border-radius:10px;">✏️
+                            へんこう</a>
+                        <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST" style="margin: 0;">
+                            <button type="submit" class="btn-delete" onclick="return confirm('ほんとうにけしますか？');">🗑️
+                                けす</button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <form action="{{ url_for('add_task') }}" method="POST" class="settings-form task-form">
+                <div class="form-row">
+                    <select name="time_of_day" required class="form-input">
+                        <option value="morning">☀️ あさ</option>
+                        <option value="evening">🌙 よる</option>
+                    </select>
+
+                    <select name="target_kid_id" class="form-input">
+                        <option value="0">ぜんいん</option>
+                        {% for kid in kids %}
+                        <option value="{{ kid.id }}">{{ kid.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <input type="text" name="text" placeholder="タスクのなまえ" required class="form-input" style="flex:2;">
+                    <input type="text" name="icon" placeholder="アイコン(例:☀️)" value="📝" class="form-input"
+                        style="flex:1;">
+                    <input type="time" name="time" value="07:00" required class="form-input" style="flex:1;">
+                </div>
+
+                <button type="submit" class="btn-add" style="margin-top: 10px;">➕ タスクをついか</button>
+            </form>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

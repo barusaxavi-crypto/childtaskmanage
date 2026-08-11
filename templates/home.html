@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>キッズ タスクかんり - ホーム</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="home-container">
+        <h1 class="home-title">どれをみる？</h1>
+
+        <div class="home-buttons">
+            <a href="{{ url_for('task_list', time_of_day='morning') }}" class="home-btn btn-morning">
+                <span class="btn-icon">☀️</span>
+                <span class="btn-text">あさのタスク</span>
+            </a>
+
+            <a href="{{ url_for('task_list', time_of_day='evening') }}" class="home-btn btn-evening">
+                <span class="btn-icon">🌙</span>
+                <span class="btn-text">よるのタスク</span>
+            </a>
+
+            <a href="{{ url_for('task_calendar') }}" class="home-btn btn-calendar">
+                <span class="btn-icon">📅</span>
+                <span class="btn-text">カレンダー</span>
+            </a>
+
+            <a href="{{ url_for('settings') }}" class="home-btn btn-settings" style="margin-top: 20px;">
+                <span class="btn-icon">⚙️</span>
+                <span class="btn-text" style="font-size: 1.5rem;">タスク・人物のへんしゅう</span>
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>キッズ タスクかんり - タスクのへんこう</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="header">
+        <a href="{{ url_for('settings') }}" class="back-btn">🏠へんしゅうへもどる</a>
+        <div class="header-title">
+            <h1>タスクのへんこう</h1>
+        </div>
+        <div style="width: 150px;"></div> <!-- レイアウト用ダミー -->
+    </div>
+
+    <div class="settings-container">
+        <div class="settings-section">
+            <h2>✏️ タスクをへんこうする</h2>
+
+            <form action="{{ url_for('edit_task', task_id=task.id) }}" method="POST" class="settings-form task-form">
+                <div class="form-row">
+                    <select name="time_of_day" required class="form-input">
+                        <option value="morning" {% if task.time_of_day=='morning' %}selected{% endif %}>☀️ あさ</option>
+                        <option value="evening" {% if task.time_of_day=='evening' %}selected{% endif %}>🌙 よる</option>
+                    </select>
+
+                    <select name="target_kid_id" class="form-input">
+                        <option value="0" {% if not task.target_kid_id %}selected{% endif %}>ぜんいん</option>
+                        {% for kid in kids %}
+                        <option value="{{ kid.id }}" {% if task.target_kid_id==kid.id %}selected{% endif %}>{{ kid.name
+                            }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <input type="text" name="text" value="{{ task.text }}" placeholder="タスクのなまえ" required
+                        class="form-input" style="flex:2;">
+                    <input type="text" name="icon" value="{{ task.icon }}" placeholder="アイコン(例:☀️)" class="form-input"
+                        style="flex:1;">
+                    <input type="time" name="time" value="{{ task.time }}" required class="form-input" style="flex:1;">
+                </div>
+
+                <button type="submit" class="btn-add" style="margin-top: 20px; background-color: #1e90ff;">💾
+                    ほぞんする</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

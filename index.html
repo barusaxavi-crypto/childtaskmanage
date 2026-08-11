@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>プリンセス・ルーティン・クエスト 👑 まほうのタスク管理</title>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#ec4899">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="sparkle-bg flex flex-col min-h-screen">
+
+  <!-- ========== トップナビゲーションバー ========== -->
+  <header class="glass-panel sticky top-0 z-30 px-4 md:px-8 py-3 border-b border-pink-200 shadow-md">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <!-- ロゴ & 朝夜バッジ -->
+      <div class="flex items-center space-x-3">
+        <div class="text-3xl filter drop-shadow-md">👑</div>
+        <div>
+          <div id="modeBadge" class="text-base md:text-xl font-black flex items-center space-x-1">
+            <!-- JSで動的更新 -->
+          </div>
+          <div class="text-[11px] font-bold text-gray-500 flex items-center space-x-2">
+            <span id="currentDateDisplay">--月--日</span>
+            <span class="text-pink-400">●</span>
+            <span id="currentTimeDisplay" class="font-num text-pink-600 font-extrabold">--:--:--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- アクションボタン群 -->
+      <div class="flex items-center space-x-2 md:space-x-3">
+        
+        <!-- 🚨 親用 まほうのカウントダウン（最重要注目ボタン） -->
+        <button 
+          onclick="startParentCountdown()"
+          class="bg-gradient-to-r from-amber-400 via-rose-400 to-pink-500 text-white font-extrabold px-3.5 md:px-5 py-2 md:py-2.5 rounded-2xl shadow-lg hover:scale-105 active:scale-95 transition-transform flex items-center space-x-1.5 border border-white/60 animate-pulse text-xs md:text-sm"
+        >
+          <span class="text-base md:text-lg">🚨</span>
+          <span class="hidden sm:inline">まほうの</span><span>あつまれタイマー！</span>
+        </button>
+
+        <!-- 朝/夜 切り替え -->
+        <button 
+          id="toggleModeBtn"
+          class="bg-white/80 hover:bg-white text-gray-700 font-bold p-2 md:px-3.5 md:py-2 rounded-2xl border border-pink-200 shadow-sm transition-all flex items-center space-x-1 text-xs md:text-sm"
+          title="あさ / よる 切り替え"
+        >
+          <span class="text-lg">☀️/🌙</span>
+        </button>
+
+        <!-- 1人/2人 切り替え -->
+        <button 
+          id="toggleLayoutBtn"
+          class="bg-white/80 hover:bg-white text-gray-700 font-bold p-2 md:px-3.5 md:py-2 rounded-2xl border border-pink-200 shadow-sm transition-all flex items-center space-x-1 text-xs md:text-sm"
+          title="1人 / 2人並列 表示切り替え"
+        >
+          <span class="text-lg">👥</span>
+        </button>
+
+        <!-- 親用設定 -->
+        <button 
+          onclick="openSettingsModal()"
+          class="bg-white/80 hover:bg-white text-pink-700 font-bold p-2 md:px-3.5 md:py-2 rounded-2xl border border-pink-200 shadow-sm transition-all flex items-center space-x-1 text-xs md:text-sm"
+          title="おうちのかたへ（設定）"
+        >
+          <span class="text-lg">⚙️</span>
+          <span class="hidden md:inline">せってい</span>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ========== メインコンテンツ（左右2画面レーン） ========== -->
+  <main id="appContainer" class="flex-1 p-3 md:p-6 flex flex-col justify-center">
+    <div id="lanesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 flex-1 w-full max-w-7xl mx-auto">
+      <!-- JSで動的に左右レーンを描画 -->
+    </div>
+  </main>
+
+  <!-- ========== 🚨 親の緊急カウントダウン全画面オーバーレイ ========== -->
+  <div id="countdownOverlay" class="hidden fixed inset-0 z-50 countdown-flash backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
+    <div class="bg-white/95 rounded-3xl p-8 max-w-md w-full shadow-2xl border-4 border-amber-400 flex flex-col items-center animate-bounce">
+      <div class="text-5xl mb-2">👑 🚨 👑</div>
+      <h2 class="text-2xl md:text-3xl font-black text-rose-600 mb-2">まほうのじかんがはじまるよ！</h2>
+      <p class="text-sm font-bold text-gray-600 mb-6">テレビをけして、タブレットにあつまろう！</p>
+      <div id="countdownNumber" class="text-7xl md:text-8xl font-black font-num text-amber-500 my-2 drop-shadow-md">
+        10
+      </div>
+      <button 
+        onclick="cancelCountdown()"
+        class="mt-6 px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold rounded-xl text-xs"
+      >
+        とじる
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== 🎁 まほうガチャ モーダル ========== -->
+  <div id="gachaModal" class="hidden fixed inset-0 z-50 bg-purple-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-panel bg-white/95 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl border-4 border-pink-300 text-center relative overflow-hidden">
+      <div class="text-xs font-extrabold text-pink-600 tracking-wider mb-1">✨ SPECIAL REWARD ✨</div>
+      <h3 class="text-2xl font-black text-gray-800 mb-4">まほうのプリンセスガチャ</h3>
+
+      <!-- ステージA: ガチャを回す前 -->
+      <div id="gachaStage" class="py-6 flex flex-col items-center">
+        <div id="gachaEgg" class="text-7xl md:text-8xl cursor-pointer hover:scale-110 transition-transform mb-6 filter drop-shadow-lg">
+          🥚✨
+        </div>
+        <p class="text-sm font-bold text-gray-600 mb-6">たまごをタップして魔法のアイテムをゲット！</p>
+        <button 
+          onclick="executeSpin()"
+          class="gacha-btn-glow px-8 py-3.5 rounded-2xl text-white font-black text-lg shadow-lg hover:scale-105 transition-transform"
+        >
+          💎 ガチャをまわす！
+        </button>
+      </div>
+
+      <!-- ステージB: ガチャ結果表示 -->
+      <div id="gachaResult" class="hidden py-4 flex flex-col items-center">
+        <div id="wonItemRarity" class="text-xs font-black px-3 py-1 rounded-full text-white bg-amber-500 mb-3">SSR</div>
+        <div id="wonItemIcon" class="text-7xl md:text-8xl mb-3 filter drop-shadow-lg crown-stamp">👑</div>
+        <div id="wonItemName" class="text-2xl font-black text-gray-900 mb-1">ダイヤモンド・ティアラ</div>
+        <p id="wonItemDesc" class="text-xs font-bold text-gray-500 mb-6">七色に輝く伝説のティアラ</p>
+        <button 
+          onclick="closeGachaModal()"
+          class="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-black rounded-2xl shadow-md hover:scale-105 transition-transform text-base"
+        >
+          やったね！ずかんにしまう 📖
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 📖 コレクション図鑑 モーダル ========== -->
+  <div id="bookModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-panel bg-white/95 rounded-3xl p-6 max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border-2 border-pink-300">
+      <div class="flex items-center justify-between pb-3 border-b border-pink-200 mb-4">
+        <h3 id="bookKidName" class="text-xl font-black text-gray-800">コレクションずかん</h3>
+        <button onclick="closeBookModal()" class="text-gray-400 hover:text-gray-600 font-bold text-xl px-2">✕</button>
+      </div>
+      <div id="bookGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-3 overflow-y-auto flex-1 p-2">
+        <!-- JSでアイテム一覧を動的生成 -->
+      </div>
+      <div class="pt-4 border-t border-pink-100 flex justify-end">
+        <button onclick="closeBookModal()" class="px-6 py-2 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-xl text-sm shadow">
+          とじる
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ⚙️ 親用設定 モーダル ========== -->
+  <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-panel bg-white rounded-3xl p-6 max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl border-2 border-pink-200">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-gray-200 mb-4">
+        <div class="flex items-center space-x-2">
+          <span class="text-2xl">⚙️</span>
+          <h3 class="text-xl font-black text-gray-800">おうちのかたへ（設定）</h3>
+        </div>
+        <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-gray-600 font-bold text-xl px-2">✕</button>
+      </div>
+
+      <div class="space-y-5 overflow-y-auto flex-1 pr-1 text-xs md:text-sm">
+        
+        <!-- お子さんの名前設定 -->
+        <div class="bg-pink-50/70 p-4 rounded-2xl border border-pink-100 space-y-3">
+          <h4 class="font-black text-pink-900 flex items-center space-x-1.5">
+            <span>👧</span><span>お子さんのお名前設定</span>
+          </h4>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-gray-600 mb-1">左レーン（1人目）</label>
+              <input type="text" id="setKid1Name" class="w-full px-3 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-400 bg-white font-bold">
+            </div>
+            <div>
+              <label class="block font-bold text-gray-600 mb-1">右レーン（2人目）</label>
+              <input type="text" id="setKid2Name" class="w-full px-3 py-2 rounded-xl border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-400 bg-white font-bold">
+            </div>
+          </div>
+        </div>
+
+        <!-- 画面レイアウト設定 -->
+        <div class="bg-purple-50/70 p-4 rounded-2xl border border-purple-100 space-y-2">
+          <h4 class="font-black text-purple-900 flex items-center space-x-1.5">
+            <span>📱</span><span>画面表示モード</span>
+          </h4>
+          <select id="setLayoutToggle" class="w-full px-3 py-2 rounded-xl border border-purple-200 font-bold bg-white focus:outline-none">
+            <option value="split">2人並列モード（タブレット向け・喧嘩防止）</option>
+            <option value="single">1人専用モード（スマホ向け）</option>
+          </select>
+        </div>
+
+        <!-- リアルごほうび設定 -->
+        <div class="bg-amber-50/70 p-4 rounded-2xl border border-amber-100 space-y-2">
+          <div class="flex items-center justify-between">
+            <h4 class="font-black text-amber-900 flex items-center space-x-1.5">
+              <span>🍪</span><span>リアルごほうび連携</span>
+            </h4>
+            <label class="flex items-center cursor-pointer">
+              <input type="checkbox" id="setRealRewardToggle" class="sr-only peer">
+              <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-500"></div>
+            </label>
+          </div>
+          <input type="text" id="setRealRewardText" placeholder="例: すきなおやつ券、YouTube15分" class="w-full px-3 py-2 rounded-xl border border-amber-200 bg-white font-bold focus:outline-none">
+          <p class="text-[11px] text-gray-500">※全タスク完了時に表示するリアルなごほうびです（不要な場合はOFFにできます）</p>
+        </div>
+
+        <!-- タスク管理 & 並び替え & 個人専用タスク追加 -->
+        <div class="bg-white p-4 rounded-2xl border border-gray-200 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-black text-gray-800 flex items-center space-x-1.5">
+              <span>📝</span><span>タスク一覧・並び替え（個人別設定可）</span>
+            </h4>
+            <button onclick="addNewTask()" class="px-3 py-1 bg-pink-500 text-white font-bold rounded-lg text-xs hover:bg-pink-600 shadow-sm">
+              ＋ タスク追加
+            </button>
+          </div>
+          <div id="settingsTaskList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+            <!-- JSで動的生成 -->
+          </div>
+          <p class="text-[11px] text-gray-400">※▲▼で順番を入れ替えられます。おくすりなど個人専用タスクも設定可能です。</p>
+        </div>
+
+        <!-- 免責事項・プライバシー表記 -->
+        <div class="text-[10px] text-gray-400 bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-1">
+          <div class="font-bold text-gray-600">🛡️ 免責事項・データ保護について</div>
+          <div>本アプリは完全スタンドアロンで動作し、入力データはお使いの端末（ブラウザ内）にのみ安全に保存されます。外部サーバーへの送信は一切行われません。</div>
+        </div>
+
+      </div>
+
+      <div class="pt-4 border-t border-gray-200 flex justify-end space-x-3">
+        <button onclick="closeSettingsModal()" class="px-4 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-xl text-xs">
+          キャンセル
+        </button>
+        <button onclick="saveSettings()" class="px-6 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold rounded-xl text-xs shadow-md hover:scale-105 transition-transform">
+          保存する
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="./js/app.js"></script>
+</body>
+</html>

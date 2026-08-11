@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>キッズ タスクかんり - カレンダー</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="header">
+        <a href="{{ url_for('home') }}" class="back-btn">🏠もどる</a>
+        <div class="header-title" style="flex: 1; text-align: center;">
+            <h1>{{ year }}ねん {{ month }}がつ</h1>
+        </div>
+        <div style="width: 120px;"></div> <!-- レイアウトの調整(左のボタンと同じくらいのダミー領域) -->
+    </div>
+
+    <div class="calendar-container">
+        <table class="calendar-table">
+            <thead>
+                <tr>
+                    <th class="sun">にち</th>
+                    <th>げつ</th>
+                    <th>か</th>
+                    <th>すい</th>
+                    <th>もく</th>
+                    <th>きん</th>
+                    <th class="sat">ど</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for week in calendar %}
+                <tr>
+                    {% for day in week %}
+                    <td class="{% if not day.is_current_month %}other-month{% endif %}">
+                        <div class="day-number">{{ day.date }}</div>
+                        <div class="day-contents">
+                            {% if day.is_current_month %}
+                            {% for k in kids %}
+                            <div class="kid-cal-row">
+                                <span class="cal-name p{{ loop.index }}-color">{{ k.name }}:</span>
+                                <span class="cal-star">
+                                    {% for _ in range(day.stars[k.id|string]) %}⭐{% endfor %}
+                                </span>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

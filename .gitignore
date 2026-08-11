@@ -1,0 +1,14 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python / Temp
+__pycache__/
+*.pyc
+venv/
+.env
+
+# 旧バックエンドデータ（新版はLocalStorageで完結）
+# childtasks.db

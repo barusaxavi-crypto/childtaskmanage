@@ -241,13 +241,18 @@
 
       </div>
 
-      <div class="pt-4 border-t border-gray-200 flex justify-end space-x-3">
-        <button onclick="closeSettingsModal()" class="px-4 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-xl text-xs">
-          キャンセル
+      <div class="pt-4 border-t border-gray-200 flex items-center justify-between">
+        <button onclick="resetAllData()" class="px-3 py-2 text-rose-500 hover:bg-rose-50 font-bold rounded-xl text-xs flex items-center space-x-1 border border-rose-200">
+          <span>🗑️</span><span>データを初期化</span>
         </button>
-        <button onclick="saveSettings()" class="px-6 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold rounded-xl text-xs shadow-md hover:scale-105 transition-transform">
-          保存する
-        </button>
+        <div class="flex items-center space-x-2">
+          <button onclick="closeSettingsModal()" class="px-4 py-2 text-gray-500 font-bold hover:bg-gray-100 rounded-xl text-xs">
+            キャンセル
+          </button>
+          <button onclick="saveSettings()" class="px-6 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold rounded-xl text-xs shadow-md hover:scale-105 transition-transform">
+            保存する
+          </button>
+        </div>
       </div>
 
     </div>

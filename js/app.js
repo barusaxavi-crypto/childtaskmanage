@@ -37,20 +37,20 @@ const DEFAULT_DATA = {
       name: 'おねえちゃん',
       avatar: '👸',
       equipped: { head: '👑', dress: '👗' },
-      coins: 3,
-      inventory: ['t14', 't16'],
-      streak: 4,
+      coins: 0,
+      inventory: [],
+      streak: 1,
       lastDate: '',
-      title: 'きらめきプリンセス'
+      title: 'みならいプリンセス'
     },
     {
       id: 'k2',
       name: 'いもうと',
       avatar: '👧',
       equipped: { head: '🎀', dress: '👗' },
-      coins: 2,
-      inventory: ['t13', 't15'],
-      streak: 3,
+      coins: 0,
+      inventory: [],
+      streak: 1,
       lastDate: '',
       title: 'みならいプリンセス'
     }
@@ -760,6 +760,17 @@ window.saveSettings = function() {
   closeSettingsModal();
   renderApp();
 };
+
+window.resetAllData = function() {
+  if (!confirm('すべてのタスク履歴・図鑑・コインをリセットして初日からやりなおしますか？')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  state = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  saveState();
+  closeSettingsModal();
+  renderApp();
+  alert('データを初期化しました！新しい冒険をはじめよう！✨');
+};
+
 
 // ==================== 12. イベントリスナー ====================
 function setupEventListeners() {

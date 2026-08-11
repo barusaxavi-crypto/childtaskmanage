@@ -78,7 +78,7 @@ const DEFAULT_DATA = {
 };
 
 // ==================== 2. ストレージ管理 ====================
-const STORAGE_KEY = 'princess_quest_state_v2';
+const STORAGE_KEY = 'princess_quest_state_v3';
 let state = loadState();
 
 function loadState() {
